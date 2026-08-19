@@ -1,0 +1,17 @@
+{
+  "name": "Rwema",
+  "short_name": "Rwema",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4fbfa",
+  "theme_color": "#16a34a",
+  "description": "Rwema - daily sales recording and reports for SIM cards, SIM swaps and movies & songs.",
+  "icons": [
+    { "src": "/icons/rwema-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/rwema-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/rwema-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
