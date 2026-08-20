@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Coins, Layers, Loader2, PlusCircle, Receipt, Wallet } from "lucide-react";
+import { Coins, Layers, Loader2, PlusCircle, Receipt, Smartphone, Wallet } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TransactionList } from "@/components/TransactionList";
 import { Button, Card, StatCard } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, sumTotals, totalsByCategory } from "@/lib/rwema";
+import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rwema";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -27,6 +27,7 @@ function Dashboard() {
   const rows = data ?? [];
   const totals = sumTotals(rows);
   const byCategory = totalsByCategory(rows);
+  const newSims = newSimQuantity(rows);
 
   return (
     <AppShell role={role} name={fullName}>
@@ -67,7 +68,20 @@ function Dashboard() {
               )}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            {role === "boss" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <StatCard
+                  label="Total New SIM Cards"
+                  value={String(newSims)}
+                  tone="sky"
+                  icon={<Smartphone className="size-5" />}
+                  hint="Quantity recorded today"
+                />
+                <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<Coins className="size-5" />} />
+              </div>
+            ) : null}
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {byCategory.map((c) => (
                 <Card key={c.category} className="space-y-2">
                   <p className="font-display font-bold">{c.label}</p>

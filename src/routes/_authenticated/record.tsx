@@ -8,7 +8,16 @@ import { Button, Card, Field, Input, Select } from "@/components/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { CATEGORIES, categoryLabel, computeSale, money, sumTotals, todayISO, type SaleCategory } from "@/lib/rwema";
+import {
+  CATEGORIES,
+  categoryLabel,
+  computeSale,
+  money,
+  saleTime,
+  sumTotals,
+  todayISO,
+  type SaleCategory,
+} from "@/lib/rwema";
 
 export const Route = createFileRoute("/_authenticated/record")({
   head: () => ({
@@ -34,6 +43,7 @@ function RecordPage() {
   const [quantity, setQuantity] = useState("1");
   const [price, setPrice] = useState("");
   const [airtime, setAirtime] = useState("");
+  const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
 
   const qty = Number(quantity) || 0;
@@ -54,12 +64,16 @@ function RecordPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (qty <= 0 || unitPrice <= 0) {
-      toast.error("Enter a quantity and price greater than zero.");
+    if (qty <= 0) {
+      toast.error("Enter a quantity greater than zero.");
       return;
     }
-    if (category === "new_sim" && air > qty * unitPrice) {
-      toast.error("Airtime cannot be greater than the gross amount.");
+    if (category !== "new_sim" && unitPrice <= 0) {
+      toast.error("Enter a price greater than zero.");
+      return;
+    }
+    if (category === "new_sim" && air <= 0) {
+      toast.error("Airtime is never free — enter the airtime amount.");
       return;
     }
     setBusy(true);
@@ -70,6 +84,7 @@ function RecordPage() {
       price: unitPrice,
       airtime: air,
       sale_date: todayISO(),
+      note: description.trim() || null,
     });
     setBusy(false);
     if (error) {
@@ -80,6 +95,7 @@ function RecordPage() {
     setQuantity("1");
     setPrice("");
     setAirtime("");
+    setDescription("");
     queryClient.invalidateQueries({ queryKey: ["transactions"] });
   };
 
@@ -127,7 +143,7 @@ function RecordPage() {
                   required
                 />
               </Field>
-              <Field label="Price">
+              <Field label={category === "new_sim" ? "SIM price (can be 0)" : "Price"}>
                 <Input
                   type="number"
                   min={0}
@@ -136,24 +152,34 @@ function RecordPage() {
                   placeholder="0"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  required
+                  required={category !== "new_sim"}
                 />
               </Field>
             </div>
 
             {category === "new_sim" ? (
-              <Field label="Airtime">
+              <Field label="Airtime (required, never free)">
                 <Input
                   type="number"
-                  min={0}
+                  min={0.01}
                   step="0.01"
                   inputMode="decimal"
                   placeholder="0"
                   value={airtime}
                   onChange={(e) => setAirtime(e.target.value)}
+                  required
                 />
               </Field>
             ) : null}
+
+            <Field label="Description (optional)">
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Any extra detail about this sale"
+                maxLength={280}
+              />
+            </Field>
 
             <div className="grid gap-2 rounded-2xl bg-muted/70 p-4 text-sm sm:grid-cols-2">
               <p>Gross: <span className="font-semibold">{money(preview.gross)}</span></p>
@@ -189,9 +215,10 @@ function RecordPage() {
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{categoryLabel(r.category)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {r.quantity} × {money(Number(r.price))}
+                      {saleTime(r.created_at)} · {r.quantity} × {money(Number(r.price))}
                       {r.category === "new_sim" ? ` · airtime ${money(Number(r.airtime))}` : ""}
                     </p>
+                    {r.note ? <p className="truncate text-xs text-muted-foreground">{r.note}</p> : null}
                   </div>
                   <div className="text-right">
                     <p className="font-semibold">{money(Number(r.net))}</p>

@@ -1,7 +1,10 @@
-export type SaleCategory = "new_sim" | "sim_swap" | "movies_songs";
+export type SaleCategory = "new_sim" | "sim_swap" | "movies_songs" | "phone_software";
 
 export const EMPLOYEE_SHARE = 0.4;
 export const BOSS_SHARE = 0.6;
+
+/** All dates and times in Rwema are Africa/Kigali. */
+export const TIME_ZONE = "Africa/Kigali";
 
 export const CATEGORIES: {
   value: SaleCategory;
@@ -11,6 +14,7 @@ export const CATEGORIES: {
   { value: "new_sim", label: "New SIM Card", hasAirtime: true },
   { value: "sim_swap", label: "SIM Swap", hasAirtime: false },
   { value: "movies_songs", label: "Movies & Songs", hasAirtime: false },
+  { value: "phone_software", label: "Phone Software", hasAirtime: false },
 ];
 
 export function categoryLabel(value: SaleCategory) {
@@ -89,6 +93,11 @@ export function totalsByCategory(rows: Transaction[]) {
   }));
 }
 
+/** Total quantity of real New SIM Card transactions in the given rows. */
+export function newSimQuantity(rows: Transaction[]) {
+  return rows.filter((r) => r.category === "new_sim").reduce((n, r) => n + Number(r.quantity), 0);
+}
+
 const currency = new Intl.NumberFormat("en-RW", {
   style: "currency",
   currency: "RWF",
@@ -99,9 +108,31 @@ export function money(n: number) {
   return currency.format(Number.isFinite(n) ? n : 0);
 }
 
-/** Local (device) date in YYYY-MM-DD. */
+/** Date in YYYY-MM-DD, always in Africa/Kigali. */
 export function todayISO(d = new Date()) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+}
+
+const timeFmt = new Intl.DateTimeFormat("en-GB", {
+  timeZone: TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+/** Exact time of a transaction (Africa/Kigali), e.g. 14:35. */
+export function saleTime(iso: string) {
+  return timeFmt.format(new Date(iso));
+}
+
+/** Date + exact time (Africa/Kigali). */
+export function saleDateTime(iso: string) {
+  return `${todayISO(new Date(iso))} ${saleTime(iso)}`;
 }
 
 export type RangeKey = "daily" | "weekly" | "monthly" | "yearly";

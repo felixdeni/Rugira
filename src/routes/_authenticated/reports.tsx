@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { BarChart3, Loader2 } from "lucide-react";
+import { BarChart3, Loader2, Smartphone } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, StatCard } from "@/components/ui";
 import { TransactionList } from "@/components/TransactionList";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rwema";
+import { money, newSimQuantity, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rwema";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -31,6 +31,7 @@ function Reports() {
   const { data, isLoading, error } = useTransactions(active);
   const rows = data ?? [];
   const totals = sumTotals(rows);
+  const newSims = newSimQuantity(rows);
 
   return (
     <AppShell role={role} name={fullName}>
@@ -78,7 +79,20 @@ function Reports() {
               )}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            {role === "boss" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <StatCard
+                  label="Total New SIM Cards"
+                  value={String(newSims)}
+                  tone="sky"
+                  icon={<Smartphone className="size-5" />}
+                  hint={`${RANGE_LABELS[active]} period`}
+                />
+                <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<BarChart3 className="size-5" />} />
+              </div>
+            ) : null}
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {totalsByCategory(rows).map((c) => (
                 <Card key={c.category} className="space-y-1">
                   <p className="font-display font-bold">{c.label}</p>
