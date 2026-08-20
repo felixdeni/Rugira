@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Moon, PlusCircle, Sun, BarChart3 } from "lucide-react";
+import { LayoutDashboard, LogOut, MessagesSquare, Moon, PlusCircle, Sun, BarChart3 } from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/useTheme";
@@ -24,6 +24,7 @@ export function AppShell({
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...(role === "employee" ? [{ to: "/record", label: "Record", icon: PlusCircle }] : []),
     { to: "/reports", label: "Reports", icon: BarChart3 },
+    { to: "/chat", label: "Chat", icon: MessagesSquare },
   ];
 
   const signOut = async () => {

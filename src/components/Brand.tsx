@@ -4,7 +4,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "brand-gradient flex size-12 items-center justify-center rounded-2xl font-display text-2xl font-extrabold text-primary-foreground shadow-lg shadow-primary/30",
+        "flex size-12 items-center justify-center rounded-2xl bg-secondary font-display text-2xl font-extrabold text-accent shadow-lg shadow-secondary/30",
         className,
       )}
       aria-hidden="true"
