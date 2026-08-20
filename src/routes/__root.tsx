@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Rwema is an installable sales app for recording daily SIM card, SIM swap and movies & songs sales with automatic 40/60 earnings.",
       },
       { name: "author", content: "Chanel" },
-      { name: "theme-color", content: "#16a34a" },
+      { name: "theme-color", content: "#1d4ed8" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Rwema" },
       { name: "mobile-web-app-capable", content: "yes" },

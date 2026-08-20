@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f4fbfa",
-  "theme_color": "#16a34a",
+  "theme_color": "#1d4ed8",
   "description": "Rwema - daily sales recording and reports for SIM cards, SIM swaps and movies & songs.",
   "icons": [
     { "src": "/icons/rwema-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
