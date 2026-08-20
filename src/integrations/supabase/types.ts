@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -113,7 +137,7 @@ export type Database = {
     }
     Enums: {
       app_role: "employee" | "boss"
-      sale_category: "new_sim" | "sim_swap" | "movies_songs"
+      sale_category: "new_sim" | "sim_swap" | "movies_songs" | "phone_software"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,7 +266,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["employee", "boss"],
-      sale_category: ["new_sim", "sim_swap", "movies_songs"],
+      sale_category: ["new_sim", "sim_swap", "movies_songs", "phone_software"],
     },
   },
 } as const
