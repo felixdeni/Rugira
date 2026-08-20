@@ -1,4 +1,4 @@
-import { categoryLabel, money, type Transaction } from "@/lib/rwema";
+import { categoryLabel, money, saleTime, type Transaction } from "@/lib/rwema";
 
 export function TransactionList({ rows, showBoss }: { rows: Transaction[]; showBoss: boolean }) {
   if (rows.length === 0) {
@@ -10,7 +10,7 @@ export function TransactionList({ rows, showBoss }: { rows: Transaction[]; showB
         <thead className="text-muted-foreground">
           <tr>
             <th className="py-2 font-medium">Category</th>
-            <th className="py-2 font-medium">Date</th>
+            <th className="py-2 font-medium">Date &amp; time</th>
             <th className="py-2 text-right font-medium">Qty</th>
             <th className="py-2 text-right font-medium">Gross</th>
             <th className="py-2 text-right font-medium">Net</th>
@@ -22,7 +22,10 @@ export function TransactionList({ rows, showBoss }: { rows: Transaction[]; showB
           {rows.map((r) => (
             <tr key={r.id} className="border-t border-border/60">
               <td className="py-2 font-medium">{categoryLabel(r.category)}</td>
-              <td className="py-2 text-muted-foreground">{r.sale_date}</td>
+              <td className="py-2 text-muted-foreground">
+                {r.sale_date} · {saleTime(r.created_at)}
+                {r.note ? <span className="block text-xs italic">{r.note}</span> : null}
+              </td>
               <td className="py-2 text-right">{r.quantity}</td>
               <td className="py-2 text-right">{money(Number(r.gross))}</td>
               <td className="py-2 text-right">{money(Number(r.net))}</td>
