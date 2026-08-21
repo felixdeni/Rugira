@@ -2,11 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Role } from "@/lib/useAuth";
 
+export const CHAT_BUCKET = "chat-media";
+
 export type ChatMessage = {
   id: string;
   sender_id: string;
   recipient_id: string;
-  body: string;
+  body: string | null;
+  media_url: string | null;
+  media_type: string | null;
+  duration_seconds: number | null;
   created_at: string;
 };
 
@@ -49,6 +54,23 @@ export function useChatPartners(userId: string | undefined, role: Role | null) {
   return { partners, loading };
 }
 
+/** Uploads a chat attachment to secure private storage and returns its object path. */
+export async function uploadChatMedia(userId: string, file: Blob, extension: string) {
+  const path = `${userId}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage.from(CHAT_BUCKET).upload(path, file, {
+    contentType: file.type || undefined,
+    upsert: false,
+  });
+  if (error) return { path: null, error: error.message };
+  return { path, error: null };
+}
+
+/** Signed URL for a private chat attachment (valid for one hour). */
+export async function signedMediaUrl(path: string) {
+  const { data } = await supabase.storage.from(CHAT_BUCKET).createSignedUrl(path, 3600);
+  return data?.signedUrl ?? null;
+}
+
 /** Realtime private conversation between the current user and one partner. */
 export function useConversation(userId: string | undefined, partnerId: string | undefined) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -70,7 +92,7 @@ export function useConversation(userId: string | undefined, partnerId: string | 
         )
         .order("created_at", { ascending: true });
       if (!active) return;
-      setMessages((data ?? []) as ChatMessage[]);
+      setMessages((data ?? []) as unknown as ChatMessage[]);
       setLoading(false);
     };
     load();
@@ -102,13 +124,23 @@ export function useConversation(userId: string | undefined, partnerId: string | 
   }, [userId, partnerId, pairKey]);
 
   const send = useCallback(
-    async (body: string) => {
+    async (input: {
+      body?: string;
+      mediaPath?: string | null;
+      mediaType?: "image" | "audio" | null;
+      durationSeconds?: number | null;
+    }) => {
       if (!userId || !partnerId) return { error: "No conversation selected" };
-      const text = body.trim();
-      if (!text) return { error: "Message is empty" };
-      const { error } = await supabase
-        .from("messages")
-        .insert({ sender_id: userId, recipient_id: partnerId, body: text });
+      const text = (input.body ?? "").trim();
+      if (!text && !input.mediaPath) return { error: "Message is empty" };
+      const { error } = await supabase.from("messages").insert({
+        sender_id: userId,
+        recipient_id: partnerId,
+        body: text,
+        media_url: input.mediaPath ?? null,
+        media_type: input.mediaType ?? null,
+        duration_seconds: input.durationSeconds ?? null,
+      });
       return { error: error?.message ?? null };
     },
     [userId, partnerId],
