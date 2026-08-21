@@ -6,16 +6,16 @@ import { Card, StatCard } from "@/components/ui";
 import { TransactionList } from "@/components/TransactionList";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, newSimQuantity, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rwema";
+import { money, newSimQuantity, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rugira";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
-      { title: "Rwema Reports | Daily, Weekly, Monthly, Yearly" },
-      { name: "description", content: "Rwema sales reports by period and category with employee 40% and boss 60% earnings." },
-      { property: "og:title", content: "Rwema Reports" },
-      { property: "og:description", content: "Daily, weekly, monthly and yearly Rwema sales reports." },
+      { title: "RUGIRA Reports | Daily, Weekly, Monthly, Yearly" },
+      { name: "description", content: "RUGIRA sales reports by period and category with employee 40% and boss 60% earnings." },
+      { property: "og:title", content: "RUGIRA Reports" },
+      { property: "og:description", content: "Daily, weekly, monthly and yearly RUGIRA sales reports." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -70,7 +70,7 @@ function Reports() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard label="Gross" value={money(totals.gross)} icon={<BarChart3 className="size-5" />} hint={`${totals.count} transactions`} />
-              <StatCard label="Net" value={money(totals.net)} tone="sky" icon={<BarChart3 className="size-5" />} hint={`Airtime ${money(totals.airtime)}`} />
+              <StatCard label="Net" value={money(totals.net)} tone="sky" icon={<BarChart3 className="size-5" />} hint={`Airtel Money ${money(totals.airtime)}`} />
               <StatCard label="Employee 40%" value={money(totals.employee)} tone="yellow" icon={<BarChart3 className="size-5" />} />
               {role === "boss" ? (
                 <StatCard label="Boss 60%" value={money(totals.boss)} icon={<BarChart3 className="size-5" />} />

@@ -5,7 +5,7 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-const INSTALLED_KEY = "rwema-installed";
+const INSTALLED_KEY = "rugira-installed";
 
 export type Platform = "android-chrome" | "ios-safari" | "desktop" | "unknown";
 
@@ -102,27 +102,27 @@ export function usePwaInstall() {
 
 export const INSTALL_STEPS: Record<Platform, string[]> = {
   "ios-safari": [
-    "Open Rwema in Safari (not in another app's browser).",
+    "Open RUGIRA in Safari (not in another app's browser).",
     "Tap the Share button in the toolbar.",
     "Choose \"Add to Home Screen\".",
-    "Tap Add, then open Rwema from your home screen.",
+    "Tap Add, then open RUGIRA from your home screen.",
   ],
   "android-chrome": [
-    "Open Rwema in Chrome.",
+    "Open RUGIRA in Chrome.",
     "Tap the three-dot menu at the top right.",
     "Choose \"Install app\" or \"Add to Home screen\".",
-    "Confirm Install, then open Rwema from your app drawer.",
+    "Confirm Install, then open RUGIRA from your app drawer.",
   ],
   desktop: [
-    "Open Rwema in Chrome, Edge or Brave.",
+    "Open RUGIRA in Chrome, Edge or Brave.",
     "Click the install icon at the right of the address bar.",
     "Click Install in the dialog.",
-    "Rwema opens in its own window.",
+    "RUGIRA opens in its own window.",
   ],
   unknown: [
-    "Open Rwema in a modern browser such as Chrome, Edge or Safari.",
+    "Open RUGIRA in a modern browser such as Chrome, Edge or Safari.",
     "Use the browser menu and pick Install app or Add to Home Screen.",
     "Confirm the installation.",
-    "Launch Rwema from your home screen.",
+    "Launch RUGIRA from your home screen.",
   ],
 };

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { rangeStart, todayISO, type RangeKey, type Transaction } from "@/lib/rwema";
+import { rangeStart, todayISO, type RangeKey, type Transaction } from "@/lib/rugira";
 
 async function fetchRange(from: string, to: string): Promise<Transaction[]> {
   const { data, error } = await supabase

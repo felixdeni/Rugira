@@ -6,15 +6,15 @@ import { AppShell } from "@/components/AppShell";
 import { Button, Card, Input } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
 import { useChatPartners, useConversation } from "@/lib/useChat";
-import { saleDateTime } from "@/lib/rwema";
+import { saleDateTime } from "@/lib/rugira";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   head: () => ({
     meta: [
-      { title: "Rwema Chat | Employee and Boss Messages" },
-      { name: "description", content: "Private realtime chat between the Rwema employee and boss, saved securely." },
-      { property: "og:title", content: "Rwema Chat" },
+      { title: "RUGIRA Chat | Employee and Boss Messages" },
+      { name: "description", content: "Private realtime chat between the RUGIRA employee and boss, saved securely." },
+      { property: "og:title", content: "RUGIRA Chat" },
       { property: "og:description", content: "Private realtime messages between employee and boss." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

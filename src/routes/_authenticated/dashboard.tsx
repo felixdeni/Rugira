@@ -5,15 +5,15 @@ import { TransactionList } from "@/components/TransactionList";
 import { Button, Card, StatCard } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rwema";
+import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rugira";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Rwema Dashboard | Today's Sales & Earnings" },
-      { name: "description", content: "Live Rwema dashboard with today's sales, category totals and 40/60 earnings split." },
-      { property: "og:title", content: "Rwema Dashboard" },
-      { property: "og:description", content: "Today's sales, category totals and earnings in Rwema." },
+      { title: "RUGIRA Dashboard | Today's Sales & Earnings" },
+      { name: "description", content: "Live RUGIRA dashboard with today's sales, category totals and 40/60 earnings split." },
+      { property: "og:title", content: "RUGIRA Dashboard" },
+      { property: "og:description", content: "Today's sales, category totals and earnings in RUGIRA." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -59,7 +59,7 @@ function Dashboard() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard label="Gross sales" value={money(totals.gross)} icon={<Receipt className="size-5" />} hint={`${totals.count} transactions`} />
-              <StatCard label="Net (after airtime)" value={money(totals.net)} tone="sky" icon={<Layers className="size-5" />} hint={`Airtime ${money(totals.airtime)}`} />
+              <StatCard label="Net (after Airtel Money)" value={money(totals.net)} tone="sky" icon={<Layers className="size-5" />} hint={`Airtel Money ${money(totals.airtime)}`} />
               <StatCard label="Employee 40%" value={money(totals.employee)} tone="yellow" icon={<Wallet className="size-5" />} />
               {role === "boss" ? (
                 <StatCard label="Boss 60%" value={money(totals.boss)} icon={<Coins className="size-5" />} />

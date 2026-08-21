@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
-const KEY = "rwema-theme";
+const KEY = "rugira-theme";
 
 function apply(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");

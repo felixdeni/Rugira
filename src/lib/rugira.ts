@@ -3,7 +3,7 @@ export type SaleCategory = "new_sim" | "sim_swap" | "movies_songs" | "phone_soft
 export const EMPLOYEE_SHARE = 0.4;
 export const BOSS_SHARE = 0.6;
 
-/** All dates and times in Rwema are Africa/Kigali. */
+/** All dates and times in RUGIRA are Africa/Kigali. */
 export const TIME_ZONE = "Africa/Kigali";
 
 export const CATEGORIES: {
@@ -14,7 +14,7 @@ export const CATEGORIES: {
   { value: "new_sim", label: "New SIM Card", hasAirtime: true },
   { value: "sim_swap", label: "SIM Swap", hasAirtime: false },
   { value: "movies_songs", label: "Movies & Songs", hasAirtime: false },
-  { value: "phone_software", label: "Phone Software", hasAirtime: false },
+  { value: "phone_software", label: "Others", hasAirtime: false },
 ];
 
 export function categoryLabel(value: SaleCategory) {

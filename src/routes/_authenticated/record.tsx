@@ -17,14 +17,14 @@ import {
   sumTotals,
   todayISO,
   type SaleCategory,
-} from "@/lib/rwema";
+} from "@/lib/rugira";
 
 export const Route = createFileRoute("/_authenticated/record")({
   head: () => ({
     meta: [
-      { title: "Record Today's Sales | Rwema" },
-      { name: "description", content: "Record today's New SIM Card, SIM Swap and Movies & Songs sales in Rwema." },
-      { property: "og:title", content: "Record Today's Sales | Rwema" },
+      { title: "Record Today's Sales | RUGIRA" },
+      { name: "description", content: "Record today's New SIM Card, SIM Swap and Movies & Songs sales in RUGIRA." },
+      { property: "og:title", content: "Record Today's Sales | RUGIRA" },
       { property: "og:description", content: "Fast daily sales entry with automatic 40/60 earnings calculation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -73,7 +73,7 @@ function RecordPage() {
       return;
     }
     if (category === "new_sim" && air <= 0) {
-      toast.error("Airtime is never free — enter the airtime amount.");
+      toast.error("Airtel Money is never free — enter the Airtel Money amount.");
       return;
     }
     setBusy(true);
@@ -158,7 +158,7 @@ function RecordPage() {
             </div>
 
             {category === "new_sim" ? (
-              <Field label="Airtime (required, never free)">
+              <Field label="Airtel Money (required, never free)">
                 <Input
                   type="number"
                   min={0.01}

@@ -1,4 +1,4 @@
-import { categoryLabel, money, saleTime, type Transaction } from "@/lib/rwema";
+import { categoryLabel, money, saleTime, type Transaction } from "@/lib/rugira";
 
 export function TransactionList({ rows, showBoss }: { rows: Transaction[]; showBoss: boolean }) {
   if (rows.length === 0) {

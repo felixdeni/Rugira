@@ -18,21 +18,30 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          duration_seconds: number | null
           id: string
+          media_type: string | null
+          media_url: string | null
           recipient_id: string
           sender_id: string
         }
         Insert: {
-          body: string
+          body?: string
           created_at?: string
+          duration_seconds?: number | null
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           recipient_id: string
           sender_id: string
         }
         Update: {
           body?: string
           created_at?: string
+          duration_seconds?: number | null
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           recipient_id?: string
           sender_id?: string
         }

@@ -10,13 +10,13 @@ import { isStandalone } from "@/lib/usePwaInstall";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in to Rwema | Sales & Reports" },
+      { title: "Sign in to RUGIRA | Sales & Reports" },
       {
         name: "description",
-        content: "Sign in to Rwema to record today's sales and view daily, weekly, monthly and yearly reports.",
+        content: "Sign in to RUGIRA to record today's sales and view daily, weekly, monthly and yearly reports.",
       },
-      { property: "og:title", content: "Sign in to Rwema" },
-      { property: "og:description", content: "Employee and Boss access to Rwema sales records and reports." },
+      { property: "og:title", content: "Sign in to RUGIRA" },
+      { property: "og:description", content: "Employee and Boss access to RUGIRA sales records and reports." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -32,7 +32,7 @@ function AuthPage() {
   const [gateOk, setGateOk] = useState(true);
 
   useEffect(() => {
-    setGateOk(isStandalone() || localStorage.getItem("rwema-installed") === "true");
+    setGateOk(isStandalone() || localStorage.getItem("rugira-installed") === "true");
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
@@ -47,7 +47,7 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Welcome back to Rwema");
+    toast.success("Welcome back to RUGIRA");
     navigate({ to: "/dashboard" });
   };
 
@@ -62,7 +62,7 @@ function AuthPage() {
           <Card className="flex items-start gap-3 border-accent/40">
             <ShieldCheck className="mt-0.5 size-5 text-accent-foreground" />
             <p className="text-sm text-muted-foreground">
-              Install Rwema first for the full app experience.{" "}
+              Install RUGIRA first for the full app experience.{" "}
               <Link to="/" className="font-semibold text-primary underline">
                 Go to installation
               </Link>
@@ -85,7 +85,7 @@ function AuthPage() {
                   required
                   autoComplete="email"
                   className="pl-11"
-                  placeholder="you@rwema.app"
+                  placeholder="you@rugira.app"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -114,7 +114,7 @@ function AuthPage() {
           </form>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">Rwema · Developed by Chanel</p>
+        <p className="text-center text-xs text-muted-foreground">RUGIRA · Developed by Chanel</p>
       </div>
     </div>
   );

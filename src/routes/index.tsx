@@ -9,16 +9,16 @@ import { INSTALL_STEPS, usePwaInstall } from "@/lib/usePwaInstall";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Install Rwema | Sales Recording & Reports" },
+      { title: "Install RUGIRA | Sales Recording & Reports" },
       {
         name: "description",
         content:
-          "Install Rwema on your device to record daily SIM card, SIM swap and movies & songs sales and view earnings reports.",
+          "Install RUGIRA on your device to record daily SIM card, SIM swap and movies & songs sales and view earnings reports.",
       },
-      { property: "og:title", content: "Install Rwema" },
+      { property: "og:title", content: "Install RUGIRA" },
       {
         property: "og:description",
-        content: "Install the Rwema app first, then sign in to record sales and view reports.",
+        content: "Install the RUGIRA app first, then sign in to record sales and view reports.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -43,7 +43,7 @@ function InstallGate() {
       return;
     }
     if (result === "dismissed") toast.error("Installation was cancelled.");
-    else toast.success("Rwema installed. You can continue to login.");
+    else toast.success("RUGIRA installed. You can continue to login.");
   };
 
   const steps = INSTALL_STEPS[pwa.platform];
@@ -62,7 +62,7 @@ function InstallGate() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="size-6 text-primary" />
                 <div>
-                  <h1 className="text-xl font-bold">Rwema is installed</h1>
+                  <h1 className="text-xl font-bold">RUGIRA is installed</h1>
                   <p className="text-sm text-muted-foreground">You can now continue to the login page.</p>
                 </div>
               </div>
@@ -76,16 +76,16 @@ function InstallGate() {
               <div className="flex items-start gap-3">
                 <Smartphone className="mt-1 size-6 text-secondary" />
                 <div>
-                  <h1 className="text-xl font-bold">Install Rwema first</h1>
+                  <h1 className="text-xl font-bold">Install RUGIRA first</h1>
                   <p className="text-sm text-muted-foreground">
-                    Rwema must be installed on this device before you can sign in.
+                    RUGIRA must be installed on this device before you can sign in.
                   </p>
                 </div>
               </div>
 
               <Button size="lg" className="w-full" onClick={onInstall} disabled={busy || !pwa.ready}>
                 {busy ? <Loader2 className="size-5 animate-spin" /> : <Download className="size-5" />}
-                Install Rwema
+                Install RUGIRA
               </Button>
 
               {!pwa.canPrompt && pwa.ready ? (
@@ -93,7 +93,7 @@ function InstallGate() {
                   <p className="flex items-center gap-2 text-sm font-semibold">
                     <Info className="size-4 text-secondary" />
                     {pwa.inIframe
-                      ? "Open Rwema in its own browser tab to install it."
+                      ? "Open RUGIRA in its own browser tab to install it."
                       : "Automatic install is not available in this browser."}
                   </p>
                   <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ function InstallGate() {
                   </ol>
                   <Button variant="outline" size="sm" className="w-full" onClick={pwa.confirmManualInstall}>
                     <CheckCircle2 className="size-4" />
-                    I have installed Rwema
+                    I have installed RUGIRA
                   </Button>
                 </div>
               ) : null}
@@ -120,7 +120,7 @@ function InstallGate() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground">
-          Install Rwema → Login → Record today's sales → View reports
+          Install RUGIRA → Login → Record today's sales → View reports
         </p>
       </div>
     </div>

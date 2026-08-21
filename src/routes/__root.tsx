@@ -78,19 +78,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Rwema | Install, Record Sales, View Reports" },
+      { title: "RUGIRA | Install, Record Sales, View Reports" },
       {
         name: "description",
         content:
-          "Rwema is an installable sales app for recording daily SIM card, SIM swap and movies & songs sales with automatic 40/60 earnings.",
+          "RUGIRA is an installable sales app for recording daily SIM card, SIM swap and movies & songs sales with automatic 40/60 earnings.",
       },
       { name: "author", content: "Chanel" },
-      { name: "theme-color", content: "#1d4ed8" },
+      { name: "theme-color", content: "#14532d" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "Rwema" },
+      { name: "apple-mobile-web-app-title", content: "RUGIRA" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { property: "og:title", content: "Rwema" },
-      { property: "og:description", content: "Install Rwema, sign in, record today's sales and view reports." },
+      { property: "og:title", content: "RUGIRA" },
+      { property: "og:description", content: "Install RUGIRA, sign in, record today's sales and view reports." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/icons/rwema-192.png" },
+      { rel: "apple-touch-icon", href: "/icons/rugira-192.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -112,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         children:
-          "try{var t=localStorage.getItem('rwema-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}",
+          "try{var t=localStorage.getItem('rugira-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}",
       },
     ],
   }),

@@ -2,15 +2,16 @@ import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <span
+    <img
+      src="/icons/rugira-512.png"
+      alt="RUGIRA logo"
       className={cn(
-        "flex size-12 items-center justify-center rounded-2xl bg-secondary font-display text-2xl font-extrabold text-accent shadow-lg shadow-secondary/30",
+        "size-12 rounded-2xl object-cover shadow-lg shadow-primary/30 ring-1 ring-glass-border",
         className,
       )}
-      aria-hidden="true"
-    >
-      R
-    </span>
+      loading="eager"
+      decoding="async"
+    />
   );
 }
 
@@ -19,7 +20,8 @@ export function Wordmark({ subtitle = true }: { subtitle?: boolean }) {
     <div className="flex items-center gap-3">
       <Logo />
       <div className="leading-tight">
-        <p className="font-display text-2xl font-extrabold brand-text">Rwema</p>
+        <p className="font-display text-2xl font-extrabold brand-text">RUGIRA</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-foreground">Refresh</p>
         {subtitle ? <p className="text-xs text-muted-foreground">Developed by Chanel</p> : null}
       </div>
     </div>
