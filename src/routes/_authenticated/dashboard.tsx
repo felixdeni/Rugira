@@ -59,7 +59,7 @@ function Dashboard() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard label="Gross sales" value={money(totals.gross)} icon={<Receipt className="size-5" />} hint={`${totals.count} transactions`} />
-              <StatCard label="Net (after airtime)" value={money(totals.net)} tone="sky" icon={<Layers className="size-5" />} hint={`Airtime ${money(totals.airtime)}`} />
+              <StatCard label="Net (after Airtel Money)" value={money(totals.net)} tone="sky" icon={<Layers className="size-5" />} hint={`Airtel Money ${money(totals.airtime)}`} />
               <StatCard label="Employee 40%" value={money(totals.employee)} tone="yellow" icon={<Wallet className="size-5" />} />
               {role === "boss" ? (
                 <StatCard label="Boss 60%" value={money(totals.boss)} icon={<Coins className="size-5" />} />

@@ -14,7 +14,7 @@ export const CATEGORIES: {
   { value: "new_sim", label: "New SIM Card", hasAirtime: true },
   { value: "sim_swap", label: "SIM Swap", hasAirtime: false },
   { value: "movies_songs", label: "Movies & Songs", hasAirtime: false },
-  { value: "phone_software", label: "Phone Software", hasAirtime: false },
+  { value: "phone_software", label: "Others", hasAirtime: false },
 ];
 
 export function categoryLabel(value: SaleCategory) {
