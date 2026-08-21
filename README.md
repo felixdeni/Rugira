@@ -1,18 +1,18 @@
-# Rwema Install & Login
+# RUGIRA Install & Login
 
-Build a real, production-ready PWA called Rwema, developed by Chanel.
+Build a real, production-ready PWA called RUGIRA, developed by Chanel.
 
 Do NOT use TanStack. Do NOT use fake/demo data. Use React + Vite + TypeScript + Tailwind CSS + Supabase.
 
 Important User Flow
 
-When a user opens Rwema:
+When a user opens RUGIRA:
 
-Show the Rwema logo (R) and app name.
+Show the RUGIRA logo (R) and app name.
 
-Show a clear message asking the user to install Rwema first.
+Show a clear message asking the user to install RUGIRA first.
 
-Show a large “Install Rwema” button.
+Show a large “Install RUGIRA” button.
 
 The user must install the PWA before accessing the Login page.
 
@@ -42,7 +42,7 @@ R
 
 App name:
 
-Rwema
+RUGIRA
 
 Developer:
 
@@ -138,13 +138,13 @@ All pages must use the same real transaction data so calculations never differ.
 
 Final requirement
 
-Keep Rwema simple.
+Keep RUGIRA simple.
 
 No chat, inventory, customers, payments, software services, notifications, CRM, or other unnecessary features.
 
 The core flow is:
 
-Install Rwema → Login → Employee records today's sales → Boss views reports.
+Install RUGIRA → Login → Employee records today's sales → Boss views reports.
 
 Make it a real, secure, installable PWA with accurate calculations and zero fake data.
 

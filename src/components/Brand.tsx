@@ -19,7 +19,7 @@ export function Wordmark({ subtitle = true }: { subtitle?: boolean }) {
     <div className="flex items-center gap-3">
       <Logo />
       <div className="leading-tight">
-        <p className="font-display text-2xl font-extrabold brand-text">Rwema</p>
+        <p className="font-display text-2xl font-extrabold brand-text">RUGIRA</p>
         {subtitle ? <p className="text-xs text-muted-foreground">Developed by Chanel</p> : null}
       </div>
     </div>

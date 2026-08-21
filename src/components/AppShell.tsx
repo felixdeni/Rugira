@@ -38,7 +38,7 @@ export function AppShell({
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
           <Logo className="size-10 rounded-xl text-xl" />
           <div className="min-w-0 flex-1 leading-tight">
-            <p className="font-display text-lg font-extrabold brand-text">Rwema</p>
+            <p className="font-display text-lg font-extrabold brand-text">RUGIRA</p>
             <p className="truncate text-xs text-muted-foreground">
               {name} · {role === "boss" ? "Boss" : "Employee"}
             </p>

@@ -3,7 +3,7 @@ export type SaleCategory = "new_sim" | "sim_swap" | "movies_songs" | "phone_soft
 export const EMPLOYEE_SHARE = 0.4;
 export const BOSS_SHARE = 0.6;
 
-/** All dates and times in Rwema are Africa/Kigali. */
+/** All dates and times in RUGIRA are Africa/Kigali. */
 export const TIME_ZONE = "Africa/Kigali";
 
 export const CATEGORIES: {

@@ -17,14 +17,14 @@ import {
   sumTotals,
   todayISO,
   type SaleCategory,
-} from "@/lib/rwema";
+} from "@/lib/rugira";
 
 export const Route = createFileRoute("/_authenticated/record")({
   head: () => ({
     meta: [
-      { title: "Record Today's Sales | Rwema" },
-      { name: "description", content: "Record today's New SIM Card, SIM Swap and Movies & Songs sales in Rwema." },
-      { property: "og:title", content: "Record Today's Sales | Rwema" },
+      { title: "Record Today's Sales | RUGIRA" },
+      { name: "description", content: "Record today's New SIM Card, SIM Swap and Movies & Songs sales in RUGIRA." },
+      { property: "og:title", content: "Record Today's Sales | RUGIRA" },
       { property: "og:description", content: "Fast daily sales entry with automatic 40/60 earnings calculation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

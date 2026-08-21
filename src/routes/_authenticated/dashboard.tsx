@@ -5,15 +5,15 @@ import { TransactionList } from "@/components/TransactionList";
 import { Button, Card, StatCard } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rwema";
+import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rugira";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Rwema Dashboard | Today's Sales & Earnings" },
-      { name: "description", content: "Live Rwema dashboard with today's sales, category totals and 40/60 earnings split." },
-      { property: "og:title", content: "Rwema Dashboard" },
-      { property: "og:description", content: "Today's sales, category totals and earnings in Rwema." },
+      { title: "RUGIRA Dashboard | Today's Sales & Earnings" },
+      { name: "description", content: "Live RUGIRA dashboard with today's sales, category totals and 40/60 earnings split." },
+      { property: "og:title", content: "RUGIRA Dashboard" },
+      { property: "og:description", content: "Today's sales, category totals and earnings in RUGIRA." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

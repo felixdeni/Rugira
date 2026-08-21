@@ -6,16 +6,16 @@ import { Card, StatCard } from "@/components/ui";
 import { TransactionList } from "@/components/TransactionList";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
-import { money, newSimQuantity, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rwema";
+import { money, newSimQuantity, RANGE_LABELS, rangeStart, sumTotals, todayISO, totalsByCategory, type RangeKey } from "@/lib/rugira";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
-      { title: "Rwema Reports | Daily, Weekly, Monthly, Yearly" },
-      { name: "description", content: "Rwema sales reports by period and category with employee 40% and boss 60% earnings." },
-      { property: "og:title", content: "Rwema Reports" },
-      { property: "og:description", content: "Daily, weekly, monthly and yearly Rwema sales reports." },
+      { title: "RUGIRA Reports | Daily, Weekly, Monthly, Yearly" },
+      { name: "description", content: "RUGIRA sales reports by period and category with employee 40% and boss 60% earnings." },
+      { property: "og:title", content: "RUGIRA Reports" },
+      { property: "og:description", content: "Daily, weekly, monthly and yearly RUGIRA sales reports." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
