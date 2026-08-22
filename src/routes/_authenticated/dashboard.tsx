@@ -69,16 +69,19 @@ function Dashboard() {
             </div>
 
             {role === "boss" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <StatCard
-                  label="Total New SIM Cards"
-                  value={String(newSims)}
-                  tone="sky"
-                  icon={<Smartphone className="size-5" />}
-                  hint="Quantity recorded today"
-                />
-                <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<Coins className="size-5" />} />
-              </div>
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <StatCard
+                    label="Total New SIM Cards"
+                    value={String(newSims)}
+                    tone="sky"
+                    icon={<Smartphone className="size-5" />}
+                    hint="Quantity recorded today"
+                  />
+                  <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<Coins className="size-5" />} />
+                </div>
+                <NewSimStatistics />
+              </>
             ) : null}
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
