@@ -6,7 +6,8 @@ import { useTheme } from "@/lib/useTheme";
 import { Logo } from "@/components/Brand";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import type { Role } from "@/lib/useAuth";
+import { useAuth, type Role } from "@/lib/useAuth";
+import { useRealtimeNotifications } from "@/lib/useNotifications";
 
 export function AppShell({
   children,
