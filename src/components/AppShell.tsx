@@ -20,6 +20,8 @@ export function AppShell({
 }) {
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  useRealtimeNotifications(user?.id, role);
 
   const links = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
