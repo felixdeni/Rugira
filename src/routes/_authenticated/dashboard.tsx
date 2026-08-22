@@ -6,6 +6,7 @@ import { Button, Card, StatCard } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
 import { useTransactions } from "@/lib/useTransactions";
 import { money, newSimQuantity, sumTotals, totalsByCategory } from "@/lib/rugira";
+import { useNewSimStats } from "@/lib/useNewSimStats";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -69,16 +70,19 @@ function Dashboard() {
             </div>
 
             {role === "boss" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <StatCard
-                  label="Total New SIM Cards"
-                  value={String(newSims)}
-                  tone="sky"
-                  icon={<Smartphone className="size-5" />}
-                  hint="Quantity recorded today"
-                />
-                <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<Coins className="size-5" />} />
-              </div>
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <StatCard
+                    label="Total New SIM Cards"
+                    value={String(newSims)}
+                    tone="sky"
+                    icon={<Smartphone className="size-5" />}
+                    hint="Quantity recorded today"
+                  />
+                  <StatCard label="Items sold" value={String(totals.quantity)} tone="yellow" icon={<Coins className="size-5" />} />
+                </div>
+                <NewSimStatistics />
+              </>
             ) : null}
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -104,5 +108,38 @@ function Dashboard() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+function NewSimStatistics() {
+  const { data, isLoading } = useNewSimStats();
+
+  return (
+    <Card className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Smartphone className="size-5 text-primary" />
+        <h2 className="font-display text-lg font-bold">New SIM Card statistics</h2>
+      </div>
+      {isLoading || !data ? (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> Loading live totals…
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {[
+            { label: "All time", value: data.allTime },
+            { label: "Today", value: data.today },
+            { label: "This week", value: data.week },
+            { label: "This month", value: data.month },
+            { label: "This year", value: data.year },
+          ].map((s) => (
+            <div key={s.label} className="rounded-2xl border border-border bg-card/60 p-3">
+              <p className="text-xs text-muted-foreground">{s.label}</p>
+              <p className="text-2xl font-bold brand-text">{s.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }
