@@ -58,7 +58,7 @@ export function useChatPartners(userId: string | undefined, role: Role | null) {
 export async function uploadChatMedia(userId: string, file: Blob, extension: string) {
   const path = `${userId}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage.from(CHAT_BUCKET).upload(path, file, {
-    contentType: file.type || undefined,
+    contentType: file.type || "application/octet-stream",
     upsert: false,
   });
   if (error) return { path: null, error: error.message };
