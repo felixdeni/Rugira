@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PublicFeed;
+  component: PublicFeed,  // ✅ Fixed: semicolon → comma
 });
 
 function PostCard({ post }: { post: Post }) {
