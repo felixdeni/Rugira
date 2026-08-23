@@ -26,22 +26,81 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+function getEnvironmentVariables() {
+  // Try multiple environment variable names for compatibility
+  const SUPABASE_URL = 
+    import.meta.env?.VITE_SUPABASE_URL || 
+    import.meta.env?.NEXT_PUBLIC_SUPABASE_URL ||
+    import.meta.env?.SUPABASE_URL ||
+    process?.env?.VITE_SUPABASE_URL ||
+    process?.env?.NEXT_PUBLIC_SUPABASE_URL ||
+    process?.env?.SUPABASE_URL ||
+    '';
+
+  // Try multiple key names (the error shows it's looking for SUPABASE_PUBLISHABLE_KEY)
+  const SUPABASE_PUBLISHABLE_KEY = 
+    import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    import.meta.env?.VITE_SUPABASE_ANON_KEY ||
+    import.meta.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    import.meta.env?.SUPABASE_PUBLISHABLE_KEY ||
+    process?.env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process?.env?.VITE_SUPABASE_ANON_KEY ||
+    process?.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process?.env?.SUPABASE_PUBLISHABLE_KEY ||
+    '';
+
+  return { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY };
+}
 
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] || process.env['SUPABASE_URL'];
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || process.env['SUPABASE_PUBLISHABLE_KEY'];
+  const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } = getEnvironmentVariables();
 
+  // Check if variables are missing
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    const missing = [];
+    if (!SUPABASE_URL) missing.push('SUPABASE_URL');
+    if (!SUPABASE_PUBLISHABLE_KEY) missing.push('SUPABASE_PUBLISHABLE_KEY');
+    
+    // Log available environment variables for debugging
+    const availableVars = Object.keys(import.meta.env || {})
+      .filter(key => key.includes('SUPABASE') || key.includes('supabase'));
+    
+    console.error(`[Supabase] ❌ Missing environment variable(s): ${missing.join(', ')}`);
+    console.error(`[Supabase] Available Supabase env vars:`, availableVars);
+    console.error(`[Supabase] URL exists: ${!!SUPABASE_URL}`);
+    console.error(`[Supabase] Key exists: ${!!SUPABASE_PUBLISHABLE_KEY}`);
+    
+    // In development, show helpful message with instructions
+    if (import.meta.env?.DEV) {
+      console.error(`
+[Supabase] 🔧 To fix this issue:
+
+1. Create a .env.local file in your project root
+2. Add these variables:
+   VITE_SUPABASE_URL="https://sodmdnjqdyfwdpfozxtf.supabase.co"
+   VITE_SUPABASE_PUBLISHABLE_KEY="your-key-here"
+   # OR
+   SUPABASE_PUBLISHABLE_KEY="your-key-here"
+
+3. Restart your development server
+
+📚 Documentation: https://supabase.com/docs/guides/getting-started/quickstarts/reactjs
+      `);
+    }
+    
+    // Don't throw error in production if variables are missing (graceful degradation)
+    if (import.meta.env?.PROD) {
+      console.warn('[Supabase] ⚠️ Running in production without Supabase configuration');
+      // Return a mock client or null to prevent crashes
+      return null;
+    }
+    
+    throw new Error(`Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud or add to .env.local`);
   }
+
+  console.log('[Supabase] ✅ Connected successfully!');
+  console.log(`[Supabase] URL: ${SUPABASE_URL}`);
+  console.log(`[Supabase] Key: ${SUPABASE_PUBLISHABLE_KEY.substring(0, 15)}...`);
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
@@ -57,12 +116,35 @@ function createSupabaseClient() {
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
 
+// Export a helper to check if Supabase is configured
+export const isSupabaseConfigured = (): boolean => {
+  const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } = getEnvironmentVariables();
+  return !!(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+};
+
+// Export the current configuration (for debugging)
+export const getSupabaseConfig = () => {
+  const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } = getEnvironmentVariables();
+  return {
+    url: SUPABASE_URL ? '✅ Set' : '❌ Missing',
+    key: SUPABASE_PUBLISHABLE_KEY ? '✅ Set' : '❌ Missing',
+    keyPrefix: SUPABASE_PUBLISHABLE_KEY ? SUPABASE_PUBLISHABLE_KEY.substring(0, 15) + '...' : 'N/A',
+  };
+};
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
+    // If client is null (production without config), return undefined for all props
+    if (!_supabase) {
+      console.warn('[Supabase] ⚠️ Client not initialized. Check your environment variables.');
+      return undefined;
+    }
     return Reflect.get(_supabase, prop, receiver);
   },
 });
 
+// Default export
+export default supabase;

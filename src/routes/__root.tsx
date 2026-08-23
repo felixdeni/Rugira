@@ -7,12 +7,32 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode, useState, createContext, useContext } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 
+// ============================================
+// Theme Context
+// ============================================
+type Theme = 'light' | 'dark';
+
+const ThemeContext = createContext<{
+  theme: Theme;
+  toggleTheme: () => void;
+}>({
+  theme: 'light',
+  toggleTheme: () => {},
+});
+
+export function useTheme() {
+  return useContext(ThemeContext);
+}
+
+// ============================================
+// Components
+// ============================================
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -73,6 +93,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+// ============================================
+// Route Definition
+// ============================================
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -95,10 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/icons/rugira-192.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
@@ -111,8 +131,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
-        children:
-          "try{var t=localStorage.getItem('rugira-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}",
+        children: `
+          (function() {
+            try {
+              var theme = localStorage.getItem('rugira-theme');
+              if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              }
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.style.colorScheme = 'dark';
+              } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.style.colorScheme = 'light';
+              }
+              localStorage.setItem('rugira-theme', theme);
+            } catch (e) {
+              document.documentElement.classList.remove('dark');
+              document.documentElement.style.colorScheme = 'light';
+            }
+          })();
+        `,
       },
     ],
   }),
@@ -122,13 +161,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// ============================================
+// Shell Component
+// ============================================
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head>
+    <html 
+      lang="en"
+      suppressHydrationWarning
+    >
+      <head suppressHydrationWarning>
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>
@@ -136,14 +181,47 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// ============================================
+// Root Component with Theme Provider
+// ============================================
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
+
+  // Load theme on client-side only
+  useEffect(() => {
+    const stored = localStorage.getItem('rugira-theme') as Theme | null;
+    if (stored === 'dark' || stored === 'light') {
+      setTheme(stored);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+    }
+    setMounted(true);
+  }, []);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.className = theme;
+      document.documentElement.style.colorScheme = theme;
+      localStorage.setItem('rugira-theme', theme);
+    }
+  }, [theme, mounted]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const value = { theme, toggleTheme };
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" richColors closeButton />
+      <ThemeContext.Provider value={value}>
+        <Outlet />
+        <Toaster position="top-center" richColors closeButton />
+      </ThemeContext.Provider>
     </QueryClientProvider>
   );
 }
