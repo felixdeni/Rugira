@@ -5,7 +5,15 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button, Card } from "@/components/ui";
 import { useAuth } from "@/lib/useAuth";
-import { signedMediaUrl, uploadChatMedia, useChatPartners, useConversation, type ChatMessage } from "@/lib/useChat";
+import {
+  blobExtension,
+  pickAudioMime,
+  signedMediaUrl,
+  uploadChatMedia,
+  useChatPartners,
+  useConversation,
+  type ChatMessage,
+} from "@/lib/useChat";
 import { saleDateTime, saleTime } from "@/lib/rugira";
 import { cn } from "@/lib/utils";
 
@@ -95,7 +103,7 @@ function ChatPage() {
     try {
       let mediaPath: string | null = null;
       if (image) {
-        const ext = (image.name.split(".").pop() || "jpg").toLowerCase();
+        const ext = blobExtension(image, (image.name.split(".").pop() || "jpg").toLowerCase());
         const up = await uploadChatMedia(user.id, image, ext);
         if (up.error || !up.path) {
           toast.error(up.error ?? "Upload failed");
@@ -127,17 +135,22 @@ function ChatPage() {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      const mime = pickAudioMime();
+      const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
       chunksRef.current = [];
       recorder.ondataavailable = (e) => e.data.size > 0 && chunksRef.current.push(e.data);
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
         const duration = Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000));
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (blob.size === 0) {
+          toast.error("Nothing was recorded. Try holding the mic a little longer.");
+          return;
+        }
         if (!user?.id || !active) return;
         setBusy(true);
         try {
-          const up = await uploadChatMedia(user.id, blob, "webm");
+          const up = await uploadChatMedia(user.id, blob, blobExtension(blob, "webm"));
           if (up.error || !up.path) {
             toast.error(up.error ?? "Upload failed");
             return;
@@ -153,8 +166,8 @@ function ChatPage() {
       recorder.start();
       recorderRef.current = recorder;
       setRecording(true);
-    } catch {
-      toast.error("Microphone permission denied");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Microphone permission denied");
     }
   };
 

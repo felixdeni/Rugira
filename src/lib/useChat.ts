@@ -54,16 +54,34 @@ export function useChatPartners(userId: string | undefined, role: Role | null) {
   return { partners, loading };
 }
 
+/** Picks a recording format the current browser actually supports (Safari records mp4, Chrome webm). */
+export function pickAudioMime() {
+  const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+  if (typeof MediaRecorder === "undefined") return "";
+  return candidates.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+}
+
+/** File extension for a blob, derived from its real mime type. */
+export function blobExtension(blob: Blob, fallback: string) {
+  const sub = blob.type.split("/")[1]?.split(";")[0];
+  if (!sub) return fallback;
+  if (sub === "mpeg") return "mp3";
+  if (sub === "quicktime") return "mov";
+  return sub.toLowerCase();
+}
+
 /** Uploads a chat attachment to secure private storage and returns its object path. */
 export async function uploadChatMedia(userId: string, file: Blob, extension: string) {
-  const path = `${userId}/${crypto.randomUUID()}.${extension}`;
+  const path = `${userId}/${crypto.randomUUID()}.${extension.replace(/[^a-z0-9]/gi, "") || "bin"}`;
+  const contentType = file.type ? file.type.split(";")[0] : "application/octet-stream";
   const { error } = await supabase.storage.from(CHAT_BUCKET).upload(path, file, {
-    contentType: file.type || "application/octet-stream",
+    contentType,
     upsert: false,
   });
   if (error) return { path: null, error: error.message };
   return { path, error: null };
 }
+
 
 /** Signed URL for a private chat attachment (valid for one hour). */
 export async function signedMediaUrl(path: string) {
