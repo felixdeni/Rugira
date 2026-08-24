@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { KeyRound, Loader2, LogIn, Mail, ShieldCheck, UserPlus, Bug } from "lucide-react";
+import { KeyRound, Loader2, LogIn, Mail, ShieldCheck, UserPlus, Bug, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/Brand";
@@ -311,6 +311,12 @@ function AuthPage() {
         <div className="flex justify-center">
           <Wordmark />
         </div>
+
+        {/* Back to Home Link */}
+        <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="mr-2 size-4" />
+          Back to Home
+        </Link>
 
         {!gateOk ? (
           <Card className="flex items-start gap-3 border-accent/40">

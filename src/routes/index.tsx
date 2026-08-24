@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Download,
   Facebook,
@@ -12,6 +12,17 @@ import {
   PackageOpen,
   Phone,
   X,
+  MapPin,
+  Clock,
+  ShoppingBag,
+  Smartphone,
+  Music,
+  RefreshCw,
+  Star,
+  Users,
+  Award,
+  ChevronRight,
+  Twitter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Brand";
@@ -19,6 +30,7 @@ import { Button, Card } from "@/components/ui";
 import { INSTALL_STEPS, usePwaInstall } from "@/lib/usePwaInstall";
 import { usePostMedia, usePosts, type Post } from "@/lib/usePosts";
 import { saleDateTime } from "@/lib/rugira";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,40 +50,45 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PublicFeed,  // ✅ Fixed: semicolon → comma
+  component: PublicFeed,
 });
 
 function PostCard({ post }: { post: Post }) {
   const url = usePostMedia(post.media_url);
   return (
-    <Card className="space-y-3 p-4">
-      <div className="overflow-hidden rounded-2xl bg-muted">
+    <Card className="group overflow-hidden transition hover:shadow-lg">
+      <div className="overflow-hidden rounded-t-2xl bg-muted">
         {!url ? (
           <div className="flex h-48 items-center justify-center text-muted-foreground">
             <Loader2 className="size-5 animate-spin" />
           </div>
         ) : post.media_type === "video" ? (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
           <video src={url} controls playsInline className="max-h-80 w-full object-cover" />
         ) : (
           <img
             src={url}
             alt={post.description || "RUGIRA product"}
             loading="lazy"
-            className="max-h-80 w-full object-cover"
+            className="max-h-80 w-full object-cover transition duration-500 group-hover:scale-105"
           />
         )}
       </div>
-      {post.description ? <p className="whitespace-pre-wrap text-sm text-foreground">{post.description}</p> : null}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{saleDateTime(post.created_at)}</p>
-        {post.product_link ? (
-          <a href={post.product_link} target="_blank" rel="noreferrer">
-            <Button size="sm">
-              <Link2 className="size-4" /> View product
-            </Button>
-          </a>
+      <div className="p-4">
+        {post.description ? (
+          <p className="line-clamp-3 whitespace-pre-wrap text-sm text-foreground">
+            {post.description}
+          </p>
         ) : null}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-muted-foreground">{saleDateTime(post.created_at)}</p>
+          {post.product_link ? (
+            <a href={post.product_link} target="_blank" rel="noreferrer">
+              <Button size="sm" variant="outline">
+                <Link2 className="size-4" /> View product
+              </Button>
+            </a>
+          ) : null}
+        </div>
       </div>
     </Card>
   );
@@ -83,6 +100,18 @@ function PublicFeed() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setIsAuthenticated(true);
+        // Redirect to dashboard if already logged in
+        window.location.href = '/dashboard';
+      }
+    });
+  }, []);
 
   const onInstall = async () => {
     setBusy(true);
@@ -100,32 +129,65 @@ function PublicFeed() {
   const steps = INSTALL_STEPS[pwa.platform];
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-background">
+      {/* Navigation */}
       <header className="sticky top-0 z-30 border-b border-glass-border bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <button
-            className="rounded-xl p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-          <Logo className="size-9 rounded-xl" />
-          <div className="min-w-0 flex-1 leading-tight">
-            <p className="font-display text-lg font-extrabold brand-text">RUGIRA</p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-accent-foreground">Refresh</p>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              className="rounded-xl p-2 text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+            <Logo className="size-9 rounded-xl" />
+            <div className="min-w-0 leading-tight">
+              <p className="font-display text-lg font-extrabold brand-text">RUGIRA</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-accent-foreground">Refresh</p>
+            </div>
           </div>
-          <Link to="/auth" aria-label="Staff login">
-            <Button size="sm" variant="outline">
-              <LogIn className="size-4" />
-              <span className="hidden sm:inline">Login</span>
-            </Button>
-          </Link>
+          
+          <nav className="hidden items-center gap-6 lg:flex">
+            <a href="#feed" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Products
+            </a>
+            <a href="#install" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Install App
+            </a>
+            <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Services
+            </a>
+            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Contact
+            </a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            {!pwa.installed && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onInstall}
+                disabled={busy || !pwa.ready}
+                className="hidden sm:flex"
+              >
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                Install
+              </Button>
+            )}
+            <Link to="/auth" aria-label="Staff login">
+              <Button size="sm" variant={isAuthenticated ? "default" : "outline"}>
+                <LogIn className="size-4" />
+                <span className="hidden sm:inline">{isAuthenticated ? "Dashboard" : "Login"}</span>
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {menuOpen ? (
-          <nav className="border-t border-glass-border bg-background/95 px-4 py-3">
+          <nav className="border-t border-glass-border bg-background/95 px-4 py-3 lg:hidden">
             <ul className="mx-auto flex max-w-3xl flex-col gap-1 text-sm font-medium">
               <li>
                 <a href="#feed" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
@@ -134,7 +196,12 @@ function PublicFeed() {
               </li>
               <li>
                 <a href="#install" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Install app
+                  Install App
+                </a>
+              </li>
+              <li>
+                <a href="#services" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
+                  Services
                 </a>
               </li>
               <li>
@@ -144,7 +211,7 @@ function PublicFeed() {
               </li>
               <li>
                 <Link to="/auth" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Staff login
+                  {isAuthenticated ? "Dashboard" : "Staff login"}
                 </Link>
               </li>
             </ul>
@@ -152,16 +219,124 @@ function PublicFeed() {
         ) : null}
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-4 py-6">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-16 lg:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
+            <div className="flex flex-col justify-center">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+                <span className="text-primary">RUGIRA</span>
+                <br />
+                <span className="text-foreground">Your Trusted Shop</span>
+              </h1>
+              <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
+                SIM Cards, SIM Swap, Movies & Songs, Phone Software — All in one place.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+                >
+                  Get Started
+                  <ChevronRight className="ml-2 size-4" />
+                </Link>
+                <a
+                  href="#feed"
+                  className="inline-flex items-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium transition hover:bg-accent"
+                >
+                  See Latest
+                </a>
+              </div>
+              <div className="mt-8 flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Users className="size-5 text-primary" />
+                  <span className="text-sm text-muted-foreground">500+ Happy Customers</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="size-5 text-yellow-500" />
+                  <span className="text-sm text-muted-foreground">4.8/5 Rating</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award className="size-5 text-primary" />
+                  <span className="text-sm text-muted-foreground">Trusted Since 2024</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative flex items-center justify-center">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-primary/10 p-6 text-center transition hover:scale-105">
+                  <Smartphone className="mx-auto size-8 text-primary" />
+                  <p className="mt-2 text-sm font-medium">SIM Cards</p>
+                  <p className="text-xs text-muted-foreground">New & Swap</p>
+                </div>
+                <div className="rounded-2xl bg-secondary/10 p-6 text-center transition hover:scale-105">
+                  <Music className="mx-auto size-8 text-secondary" />
+                  <p className="mt-2 text-sm font-medium">Movies & Songs</p>
+                  <p className="text-xs text-muted-foreground">Latest collection</p>
+                </div>
+                <div className="rounded-2xl bg-accent/10 p-6 text-center transition hover:scale-105">
+                  <RefreshCw className="mx-auto size-8 text-accent" />
+                  <p className="mt-2 text-sm font-medium">SIM Swap</p>
+                  <p className="text-xs text-muted-foreground">Fast & Easy</p>
+                </div>
+                <div className="rounded-2xl bg-primary/10 p-6 text-center transition hover:scale-105">
+                  <ShoppingBag className="mx-auto size-8 text-primary" />
+                  <p className="mt-2 text-sm font-medium">Phone Software</p>
+                  <p className="text-xs text-muted-foreground">Professional</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold">About Our Shop</h2>
+          <p className="mt-2 text-center text-muted-foreground">
+            Everything you need, right here
+          </p>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Card className="p-6 transition hover:shadow-lg">
+              <MapPin className="size-8 text-primary" />
+              <h3 className="mt-4 font-semibold">Location</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Kigali, Rwanda<br />
+                Near Central Market
+              </p>
+            </Card>
+            <Card className="p-6 transition hover:shadow-lg">
+              <Clock className="size-8 text-primary" />
+              <h3 className="mt-4 font-semibold">Opening Hours</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Mon - Fri: 8:00 AM - 8:00 PM<br />
+                Sat: 9:00 AM - 6:00 PM
+              </p>
+            </Card>
+            <Card className="p-6 transition hover:shadow-lg">
+              <Phone className="size-8 text-primary" />
+              <h3 className="mt-4 font-semibold">Contact</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                +250 780 000 000<br />
+                info@rugira.app
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
         <section className="space-y-2">
-          <h1 className="font-display text-2xl font-extrabold">Latest from RUGIRA</h1>
+          <h2 id="feed" className="font-display text-2xl font-extrabold">Latest from RUGIRA</h2>
           <p className="text-sm text-muted-foreground">
             New SIM cards, SIM swap, movies &amp; songs and more — straight from the shop.
           </p>
         </section>
 
         {!pwa.installed ? (
-          <Card id="install" className="space-y-3">
+          <Card id="install" className="space-y-3 border-primary/20 bg-primary/5">
             <div className="flex items-start gap-3">
               <Download className="mt-1 size-5 text-primary" />
               <div>
@@ -183,24 +358,29 @@ function PublicFeed() {
           </Card>
         ) : null}
 
-        <section id="feed" className="space-y-4">
+        <section className="space-y-4">
           {loading ? (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" /> Loading products…
-            </p>
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="size-8 animate-spin text-primary" />
+            </div>
           ) : posts.length === 0 ? (
-            <Card className="flex items-center gap-3">
+            <Card className="flex items-center gap-3 p-6">
               <PackageOpen className="size-6 text-secondary" />
               <p className="text-sm text-muted-foreground">No products published yet. Check back soon.</p>
             </Card>
           ) : (
-            posts.map((p) => <PostCard key={p.id} post={p} />)
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => (
+                <PostCard key={p.id} post={p} />
+              ))}
+            </div>
           )}
         </section>
       </main>
 
+      {/* Footer */}
       <footer id="contact" className="border-t border-glass-border bg-card/40 px-4 py-8">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 text-center">
           <Logo className="size-10 rounded-xl" />
           <p className="text-sm text-muted-foreground">RUGIRA — Refresh. Developed by Chanel.</p>
           <div className="flex items-center gap-3">
@@ -209,7 +389,7 @@ function PublicFeed() {
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
-              className="rounded-xl bg-primary/10 p-3 text-primary hover:bg-primary/20"
+              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
             >
               <MessageCircle className="size-5" />
             </a>
@@ -218,7 +398,7 @@ function PublicFeed() {
               target="_blank"
               rel="noreferrer"
               aria-label="Facebook"
-              className="rounded-xl bg-primary/10 p-3 text-primary hover:bg-primary/20"
+              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
             >
               <Facebook className="size-5" />
             </a>
@@ -227,14 +407,23 @@ function PublicFeed() {
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
-              className="rounded-xl bg-primary/10 p-3 text-primary hover:bg-primary/20"
+              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
             >
               <Instagram className="size-5" />
             </a>
             <a
+              href="https://twitter.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Twitter"
+              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
+            >
+              <Twitter className="size-5" />
+            </a>
+            <a
               href="tel:+250780000000"
               aria-label="Call RUGIRA"
-              className="rounded-xl bg-primary/10 p-3 text-primary hover:bg-primary/20"
+              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
             >
               <Phone className="size-5" />
             </a>
