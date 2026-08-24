@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { KeyRound, Loader2, LogIn, Mail, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2, LogIn, Mail, ShieldCheck, UserPlus, Bug } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/Brand";
@@ -30,27 +30,281 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [gateOk, setGateOk] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>("");
+  const [showDebug, setShowDebug] = useState(false);
 
+  // ============================================
+  // DEBUG: Check Supabase Configuration
+  // ============================================
   useEffect(() => {
+    console.log("🔍 ===== SUPABASE CONFIGURATION CHECK =====");
+    console.log("🔍 Supabase client exists:", !!supabase);
+    
+    // Check environment variables
+    const envVars = {
+      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? "✅ Set" : "❌ Missing",
+      VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Missing",
+      SUPABASE_PUBLISHABLE_KEY: import.meta.env.SUPABASE_PUBLISHABLE_KEY ? "✅ Set" : "❌ Missing",
+    };
+    console.log("🔍 Environment Variables:", envVars);
+    
+    // Try to get Supabase URL and key from client
+    if (supabase) {
+      // @ts-ignore - Access internal properties for debugging
+      const clientUrl = supabase?.supabaseUrl || "Unknown";
+      // @ts-ignore - Access internal properties for debugging
+      const clientKey = supabase?.supabaseKey ? "✅ Set" : "❌ Missing";
+      console.log("🔍 Supabase client URL:", clientUrl);
+      console.log("🔍 Supabase client key:", clientKey);
+      
+      setDebugInfo(`URL: ${clientUrl}\nKey: ${clientKey}`);
+    }
+
     setGateOk(isStandalone() || localStorage.getItem("rugira-installed") === "true");
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
-    });
+    
+    // Check current session
+    if (supabase) {
+      supabase.auth.getSession()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error("❌ Session check error:", error);
+            return;
+          }
+          if (data.session) {
+            console.log("✅ User already logged in:", data.session.user.email);
+            navigate({ to: "/dashboard" });
+          } else {
+            console.log("ℹ️ No active session found");
+          }
+        })
+        .catch(err => {
+          console.error("❌ Session check failed:", err);
+        });
+    }
   }, [navigate]);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
+  // ============================================
+  // DEBUG: Check if user exists
+  // ============================================
+  const checkUserExists = async () => {
+    if (!email) {
+      toast.error("Please enter an email first");
       return;
     }
-    toast.success("Welcome back to RUGIRA");
-    navigate({ to: "/dashboard" });
+
+    setBusy(true);
+    try {
+      console.log("🔍 Checking if user exists:", email);
+      
+      // Try to check if user exists by attempting a password reset
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+      
+      if (error) {
+        if (error.message.includes("User not found")) {
+          toast.error(`❌ User "${email}" does not exist in Supabase Auth`);
+          setDebugInfo(`User "${email}" does NOT exist in the database.`);
+        } else {
+          console.log("ℹ️ Reset password response:", error.message);
+          toast.info(`User exists but: ${error.message}`);
+          setDebugInfo(`User exists: ${error.message}`);
+        }
+      } else {
+        toast.success(`✅ User "${email}" exists! Check your email for reset link.`);
+        setDebugInfo(`✅ User "${email}" exists in the database.`);
+      }
+    } catch (err) {
+      console.error("❌ Error checking user:", err);
+      toast.error("Error checking user existence");
+    } finally {
+      setBusy(false);
+    }
   };
 
+  // ============================================
+  // DEBUG: Create test user
+  // ============================================
+  const createTestUser = async () => {
+    setBusy(true);
+    try {
+      console.log("🔍 Creating test user...");
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: 'ganelvibes0@gmail.com',
+        password: 'TestPassword123!',
+        options: {
+          data: {
+            full_name: 'Chanel Developer',
+          },
+        },
+      });
+
+      if (error) {
+        console.error("❌ Error creating user:", error);
+        
+        if (error.message.includes("User already registered")) {
+          toast.info("User already exists. Try logging in.");
+          setDebugInfo("User already exists in Supabase Auth.");
+        } else {
+          toast.error("Failed to create user: " + error.message);
+          setDebugInfo(`Creation failed: ${error.message}`);
+        }
+      } else {
+        console.log("✅ User created successfully!", data);
+        toast.success("User created! You can now log in.");
+        setDebugInfo(`✅ User created: ${data.user?.email}`);
+        setEmail('ganelvibes0@gmail.com');
+        setPassword('TestPassword123!');
+      }
+    } catch (err) {
+      console.error("❌ Unexpected error:", err);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // ============================================
+  // MAIN LOGIN FUNCTION
+  // ============================================
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setBusy(true);
+
+    // Validate inputs
+    if (!email || email.trim() === "") {
+      toast.error("Please enter your email address");
+      setBusy(false);
+      return;
+    }
+
+    if (!password || password === "") {
+      toast.error("Please enter your password");
+      setBusy(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      setBusy(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      setBusy(false);
+      return;
+    }
+
+    if (!supabase) {
+      toast.error("Authentication service is not available. Please try again later.");
+      setBusy(false);
+      return;
+    }
+
+    // ============================================
+    // ATTEMPT LOGIN
+    // ============================================
+    try {
+      console.log("🔍 ===== LOGIN ATTEMPT =====");
+      console.log("🔍 Email:", email.trim());
+      console.log("🔍 Password length:", password.length);
+      console.log("🔍 Supabase client:", supabase ? "Available" : "Not available");
+      
+      // @ts-ignore - Get Supabase URL for debugging
+      console.log("🔍 Supabase URL:", supabase?.supabaseUrl || "Unknown");
+      
+      const startTime = Date.now();
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      const endTime = Date.now();
+      console.log(`🔍 Request took: ${endTime - startTime}ms`);
+
+      // Handle error
+      if (signInError) {
+        console.error("❌ Supabase login error:", signInError);
+        console.error("❌ Error details:", {
+          status: signInError.status,
+          message: signInError.message,
+          name: signInError.name,
+          code: signInError.code,
+        });
+
+        // Detailed error messages
+        let errorMessage = signInError.message;
+        let debugMessage = "";
+
+        if (signInError.message.includes("Invalid login credentials")) {
+          errorMessage = "Invalid email or password. Please check your credentials and try again.";
+          debugMessage = "Invalid credentials - user might not exist or password is wrong";
+        } else if (signInError.message.includes("Email not confirmed")) {
+          errorMessage = "Please confirm your email address. Check your inbox for the confirmation link.";
+          debugMessage = "Email not confirmed in Supabase Auth";
+        } else if (signInError.message.includes("rate limit")) {
+          errorMessage = "Too many failed attempts. Please wait a few minutes and try again.";
+          debugMessage = "Rate limited by Supabase";
+        } else if (signInError.message.includes("not found")) {
+          errorMessage = "No account found with this email. Please check your email address.";
+          debugMessage = "User not found in Supabase Auth";
+        } else if (signInError.message.includes("network")) {
+          errorMessage = "Network error. Please check your internet connection.";
+          debugMessage = "Network error";
+        } else if (signInError.message.includes("Invalid Refresh Token")) {
+          errorMessage = "Session expired. Please log in again.";
+          debugMessage = "Refresh token invalid";
+        }
+
+        setError(errorMessage);
+        setDebugInfo(`❌ ${debugMessage || signInError.message}`);
+        toast.error(errorMessage);
+        setBusy(false);
+        return;
+      }
+
+      // Check user data
+      if (!data?.user) {
+        console.error("❌ No user data returned");
+        toast.error("Login failed. No user data returned.");
+        setDebugInfo("❌ No user data from Supabase");
+        setBusy(false);
+        return;
+      }
+
+      console.log("✅ Login successful!");
+      console.log("✅ User ID:", data.user.id);
+      console.log("✅ User Email:", data.user.email);
+      console.log("✅ Session:", data.session ? "✅ Active" : "❌ No session");
+      
+      toast.success("Welcome back to RUGIRA! 🎉");
+      setDebugInfo(`✅ Login successful: ${data.user.email}`);
+      
+      // Navigate after session is saved
+      setTimeout(() => {
+        navigate({ to: "/dashboard" });
+      }, 500);
+
+    } catch (err) {
+      console.error("❌ Unexpected login error:", err);
+      const message = err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
+      setDebugInfo(`❌ Unexpected error: ${message}`);
+      toast.error("Login failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <div className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="w-full max-w-md space-y-6">
@@ -88,6 +342,7 @@ function AuthPage() {
                   placeholder="you@rugira.app"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={busy}
                 />
               </div>
             </Field>
@@ -103,14 +358,64 @@ function AuthPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={busy}
                 />
               </div>
             </Field>
 
-            <Button type="submit" size="lg" className="w-full" disabled={busy}>
-              {busy ? <Loader2 className="size-5 animate-spin" /> : <LogIn className="size-5" />}
-              Sign in
-            </Button>
+            {error && (
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button type="submit" size="lg" className="flex-1" disabled={busy}>
+                {busy ? <Loader2 className="size-5 animate-spin" /> : <LogIn className="size-5" />}
+                {busy ? "Signing in..." : "Sign in"}
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={() => setShowDebug(!showDebug)}
+                disabled={busy}
+              >
+                <Bug className="size-4" />
+              </Button>
+            </div>
+
+            {/* Debug Tools */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={checkUserExists}
+                disabled={busy || !email}
+              >
+                Check User
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={createTestUser}
+                disabled={busy}
+              >
+                <UserPlus className="mr-2 size-3" />
+                Create Test
+              </Button>
+            </div>
+
+            {showDebug && debugInfo && (
+              <div className="rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground">
+                <pre className="whitespace-pre-wrap break-all">{debugInfo}</pre>
+              </div>
+            )}
           </form>
         </Card>
 
