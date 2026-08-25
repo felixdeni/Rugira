@@ -291,7 +291,7 @@ function PublicFeed() {
         <section className="space-y-2">
           <h2 id="feed" className="font-display text-2xl font-extrabold">Latest from RUGIRA</h2>
           <p className="text-sm text-muted-foreground">
-            New SIM cards, movies &amp; songs and more — straight from the shop.
+            New SIM cards, movies &amp; songs and Others.
           </p>
         </section>
 
