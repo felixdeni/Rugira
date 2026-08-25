@@ -226,16 +226,7 @@ function PublicFeed() {
         </div>
       </section>
 
-      {/* New Products Banner */}
-      <section className="py-8">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl bg-primary/10 p-6 text-center">
-            <PackageOpen className="mx-auto size-8 text-primary" />
-            <h2 className="mt-2 text-xl font-semibold">New products will be showcased here soon.</h2>
-            <p className="text-sm text-muted-foreground">Stay tuned for the latest arrivals from RUGIRA.</p>
-          </div>
-        </div>
-      </section>
+ <ImageCarousel posts={posts} />
 
       {/* Services Section */}
       <section id="services" className="py-16">
@@ -247,7 +238,7 @@ function PublicFeed() {
               <MapPin className="size-8 text-primary" />
               <h3 className="mt-4 font-semibold">Location</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Kigali, Rwanda<br />
+                Remera, Muhanga<br />
                 Near Central Market
               </p>
             </Card>
@@ -256,14 +247,14 @@ function PublicFeed() {
               <h3 className="mt-4 font-semibold">Opening Hours</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Mon - Fri: 8:00 AM - 8:00 PM<br />
-                Sat: 9:00 AM - 6:00 PM
+                Sat: 7:00 AM - 8:00 PM
               </p>
             </Card>
             <Card className="p-6 transition hover:shadow-lg">
               <Phone className="size-8 text-primary" />
               <h3 className="mt-4 font-semibold">Contact</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                +250 780 000 000<br />
+                +250 724 885 288<br />
                 info@rugira.app
               </p>
             </Card>
@@ -273,7 +264,7 @@ function PublicFeed() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
-        <ImageCarousel posts={posts} />
+       
 
         <section className="space-y-2">
           <h2 id="feed" className="font-display text-2xl font-extrabold">Latest from RUGIRA</h2>
