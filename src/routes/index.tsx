@@ -18,15 +18,12 @@ import {
   Smartphone,
   Music,
   RefreshCw,
-  Star,
-  Users,
-  Award,
-  ChevronRight,
   Twitter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Brand";
 import { Button, Card } from "@/components/ui";
+import { ImageCarousel } from "@/components/ImageCarousel";
 import { INSTALL_STEPS, usePwaInstall } from "@/lib/usePwaInstall";
 import { usePostMedia, usePosts, type Post } from "@/lib/usePosts";
 import { saleDateTime } from "@/lib/rugira";
@@ -39,7 +36,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Browse the latest RUGIRA products and offers — new SIM cards, SIM swap, movies & songs and phone services. Install the app or sign in as staff.",
+          "Browse the latest RUGIRA products and offers — new SIM cards, movies & songs and phone services. Install the app or sign in as staff.",
       },
       { property: "og:title", content: "RUGIRA — Refresh" },
       {
@@ -103,11 +100,9 @@ function PublicFeed() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         setIsAuthenticated(true);
-        // Redirect to dashboard if already logged in
         window.location.href = '/dashboard';
       }
     });
@@ -148,31 +143,17 @@ function PublicFeed() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-accent-foreground">Refresh</p>
             </div>
           </div>
-          
+
           <nav className="hidden items-center gap-6 lg:flex">
-            <a href="#feed" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Products
-            </a>
-            <a href="#install" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Install App
-            </a>
-            <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Services
-            </a>
-            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Contact
-            </a>
+            <a href="#feed" className="text-sm font-medium text-muted-foreground hover:text-foreground">Products</a>
+            <a href="#install" className="text-sm font-medium text-muted-foreground hover:text-foreground">Install App</a>
+            <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">Services</a>
+            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground">Contact</a>
           </nav>
 
           <div className="flex items-center gap-3">
             {!pwa.installed && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={onInstall}
-                disabled={busy || !pwa.ready}
-                className="hidden sm:flex"
-              >
+              <Button size="sm" variant="outline" onClick={onInstall} disabled={busy || !pwa.ready} className="hidden sm:flex">
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
                 Install
               </Button>
@@ -189,26 +170,10 @@ function PublicFeed() {
         {menuOpen ? (
           <nav className="border-t border-glass-border bg-background/95 px-4 py-3 lg:hidden">
             <ul className="mx-auto flex max-w-3xl flex-col gap-1 text-sm font-medium">
-              <li>
-                <a href="#feed" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Products
-                </a>
-              </li>
-              <li>
-                <a href="#install" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Install App
-                </a>
-              </li>
-              <li>
-                <a href="#services" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Services
-                </a>
-              </li>
-              <li>
-                <a href="#contact" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
-                  Contact
-                </a>
-              </li>
+              <li><a href="#feed" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">Products</a></li>
+              <li><a href="#install" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">Install App</a></li>
+              <li><a href="#services" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">Services</a></li>
+              <li><a href="#contact" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">Contact</a></li>
               <li>
                 <Link to="/auth" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-2 hover:bg-muted">
                   {isAuthenticated ? "Dashboard" : "Staff login"}
@@ -227,40 +192,11 @@ function PublicFeed() {
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                 <span className="text-primary">RUGIRA</span>
                 <br />
-                <span className="text-foreground">Your Trusted Shop</span>
+                <span className="text-foreground">Your Shop</span>
               </h1>
               <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
-                SIM Cards, SIM Swap, Movies & Songs, Phone Software — All in one place.
+                SIM Cards, Movies & Songs, and Others — All in one place.
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link
-                  to="/auth"
-                  className="inline-flex items-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-                >
-                  Get Started
-                  <ChevronRight className="ml-2 size-4" />
-                </Link>
-                <a
-                  href="#feed"
-                  className="inline-flex items-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium transition hover:bg-accent"
-                >
-                  See Latest
-                </a>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <Users className="size-5 text-primary" />
-                  <span className="text-sm text-muted-foreground">500+ Happy Customers</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star className="size-5 text-yellow-500" />
-                  <span className="text-sm text-muted-foreground">4.8/5 Rating</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Award className="size-5 text-primary" />
-                  <span className="text-sm text-muted-foreground">Trusted Since 2024</span>
-                </div>
-              </div>
             </div>
             <div className="relative flex items-center justify-center">
               <div className="grid grid-cols-2 gap-4">
@@ -276,7 +212,7 @@ function PublicFeed() {
                 </div>
                 <div className="rounded-2xl bg-accent/10 p-6 text-center transition hover:scale-105">
                   <RefreshCw className="mx-auto size-8 text-accent" />
-                  <p className="mt-2 text-sm font-medium">SIM Swap</p>
+                  <p className="mt-2 text-sm font-medium">Others</p>
                   <p className="text-xs text-muted-foreground">Fast & Easy</p>
                 </div>
                 <div className="rounded-2xl bg-primary/10 p-6 text-center transition hover:scale-105">
@@ -290,13 +226,22 @@ function PublicFeed() {
         </div>
       </section>
 
+      {/* New Products Banner */}
+      <section className="py-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl bg-primary/10 p-6 text-center">
+            <PackageOpen className="mx-auto size-8 text-primary" />
+            <h2 className="mt-2 text-xl font-semibold">New products will be showcased here soon.</h2>
+            <p className="text-sm text-muted-foreground">Stay tuned for the latest arrivals from RUGIRA.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Services Section */}
       <section id="services" className="py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold">About Our Shop</h2>
-          <p className="mt-2 text-center text-muted-foreground">
-            Everything you need, right here
-          </p>
+          <p className="mt-2 text-center text-muted-foreground">Everything you need, right here</p>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Card className="p-6 transition hover:shadow-lg">
               <MapPin className="size-8 text-primary" />
@@ -328,10 +273,12 @@ function PublicFeed() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+        <ImageCarousel posts={posts} />
+
         <section className="space-y-2">
           <h2 id="feed" className="font-display text-2xl font-extrabold">Latest from RUGIRA</h2>
           <p className="text-sm text-muted-foreground">
-            New SIM cards, SIM swap, movies &amp; songs and more — straight from the shop.
+            New SIM cards, movies &amp; songs and more — straight from the shop.
           </p>
         </section>
 
@@ -364,10 +311,10 @@ function PublicFeed() {
               <Loader2 className="size-8 animate-spin text-primary" />
             </div>
           ) : posts.length === 0 ? (
-            <Card className="flex items-center gap-3 p-6">
-              <PackageOpen className="size-6 text-secondary" />
-              <p className="text-sm text-muted-foreground">No products published yet. Check back soon.</p>
-            </Card>
+            <div className="flex items-center justify-center py-12">
+              <PackageOpen className="size-8 text-muted-foreground/40" />
+              <p className="ml-4 text-muted-foreground">No products yet. Check back soon!</p>
+            </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((p) => (
@@ -384,47 +331,19 @@ function PublicFeed() {
           <Logo className="size-10 rounded-xl" />
           <p className="text-sm text-muted-foreground">RUGIRA — Refresh. Developed by Chanel.</p>
           <div className="flex items-center gap-3">
-            <a
-              href="https://wa.me/250780000000"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="WhatsApp"
-              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
-            >
+            <a href="https://wa.me/250780000000" target="_blank" rel="noreferrer" aria-label="WhatsApp" className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20">
               <MessageCircle className="size-5" />
             </a>
-            <a
-              href="https://www.facebook.com/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Facebook"
-              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
-            >
+            <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook" className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20">
               <Facebook className="size-5" />
             </a>
-            <a
-              href="https://www.instagram.com/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
-            >
+            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram" className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20">
               <Instagram className="size-5" />
             </a>
-            <a
-              href="https://twitter.com/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Twitter"
-              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
-            >
+            <a href="https://twitter.com/" target="_blank" rel="noreferrer" aria-label="Twitter" className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20">
               <Twitter className="size-5" />
             </a>
-            <a
-              href="tel:+250780000000"
-              aria-label="Call RUGIRA"
-              className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20"
-            >
+            <a href="tel:+250780000000" aria-label="Call RUGIRA" className="rounded-xl bg-primary/10 p-3 text-primary transition hover:bg-primary/20">
               <Phone className="size-5" />
             </a>
           </div>

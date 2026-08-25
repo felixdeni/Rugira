@@ -1,5 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, MessagesSquare, Moon, PlusCircle, Sun, BarChart3 } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  MessagesSquare,
+  Moon,
+  PlusCircle,
+  Sun,
+  BarChart3,
+  ImagePlus,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/useTheme";
@@ -26,6 +35,7 @@ export function AppShell({
   const links = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...(role === "employee" ? [{ to: "/record", label: "Record", icon: PlusCircle }] : []),
+    ...(role === "boss" ? [{ to: "/posts", label: "Posts", icon: ImagePlus }] : []),
     { to: "/reports", label: "Reports", icon: BarChart3 },
     { to: "/chat", label: "Chat", icon: MessagesSquare },
   ];
