@@ -19,6 +19,8 @@ import {
   Music,
   RefreshCw,
   Twitter,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Brand";
@@ -28,6 +30,7 @@ import { INSTALL_STEPS, usePwaInstall } from "@/lib/usePwaInstall";
 import { usePostMedia, usePosts, type Post } from "@/lib/usePosts";
 import { saleDateTime } from "@/lib/rugira";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/lib/useTheme";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -94,6 +97,7 @@ function PostCard({ post }: { post: Post }) {
 function PublicFeed() {
   const pwa = usePwaInstall();
   const { posts, loading } = usePosts();
+  const { theme, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
@@ -125,6 +129,17 @@ function PublicFeed() {
 
   return (
     <div className="min-h-dvh bg-background">
+      {/* Floating WhatsApp Button */}
+      <a
+        href="https://wa.me/250724885288?text=Hello%20RUGIRA%2C%20I%20would%20like%20to%20know%20more%20about%20your%20products."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-4 z-50 rounded-full bg-green-500 p-4 text-white shadow-lg transition hover:scale-110 hover:bg-green-600 sm:bottom-6"
+        aria-label="Chat on WhatsApp"
+      >
+        <MessageCircle className="size-6" />
+      </a>
+
       {/* Navigation */}
       <header className="sticky top-0 z-30 border-b border-glass-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -152,6 +167,15 @@ function PublicFeed() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className="rounded-xl"
+            >
+              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </Button>
             {!pwa.installed && (
               <Button size="sm" variant="outline" onClick={onInstall} disabled={busy || !pwa.ready} className="hidden sm:flex">
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
@@ -226,7 +250,7 @@ function PublicFeed() {
         </div>
       </section>
 
- <ImageCarousel posts={posts} />
+      <ImageCarousel posts={posts} />
 
       {/* Services Section */}
       <section id="services" className="py-16">
@@ -264,8 +288,6 @@ function PublicFeed() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
-       
-
         <section className="space-y-2">
           <h2 id="feed" className="font-display text-2xl font-extrabold">Latest from RUGIRA</h2>
           <p className="text-sm text-muted-foreground">

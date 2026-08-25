@@ -381,41 +381,10 @@ function AuthPage() {
                 {busy ? "Signing in..." : "Sign in"}
               </Button>
               
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                onClick={() => setShowDebug(!showDebug)}
-                disabled={busy}
-              >
-                <Bug className="size-4" />
-              </Button>
+              
             </div>
 
-            {/* Debug Tools */}
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={checkUserExists}
-                disabled={busy || !email}
-              >
-                Check User
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={createTestUser}
-                disabled={busy}
-              >
-                <UserPlus className="mr-2 size-3" />
-                Create Test
-              </Button>
-            </div>
+
 
             {showDebug && debugInfo && (
               <div className="rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground">
