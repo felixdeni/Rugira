@@ -208,6 +208,8 @@ function PublicFeed() {
         ) : null}
       </header>
 
+      <ImageCarousel posts={posts} />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-16 lg:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -249,8 +251,6 @@ function PublicFeed() {
           </div>
         </div>
       </section>
-
-      <ImageCarousel posts={posts} />
 
       {/* Services Section */}
       <section id="services" className="py-16">
