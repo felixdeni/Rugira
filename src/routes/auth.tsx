@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { KeyRound, Loader2, LogIn, Mail, ShieldCheck, UserPlus, Bug, ArrowLeft } from "lucide-react";
+import { KeyRound, Loader2, LogIn, Mail, ShieldCheck, UserPlus, Bug, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/Brand";
@@ -33,6 +33,8 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>("");
   const [showDebug, setShowDebug] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // ============================================
   // DEBUG: Check Supabase Configuration
@@ -62,6 +64,19 @@ function AuthPage() {
     }
 
     setGateOk(isStandalone() || localStorage.getItem("rugira-installed") === "true");
+    
+    // Load saved credentials if remember me was checked
+    const savedEmail = localStorage.getItem("rugira-email");
+    const savedPassword = localStorage.getItem("rugira-password");
+    const savedRemember = localStorage.getItem("rugira-remember") === "true";
+    
+    if (savedRemember && savedEmail) {
+      setEmail(savedEmail);
+      if (savedPassword) {
+        setPassword(savedPassword);
+      }
+      setRememberMe(true);
+    }
     
     // Check current session
     if (supabase) {
@@ -283,6 +298,17 @@ function AuthPage() {
       console.log("✅ User Email:", data.user.email);
       console.log("✅ Session:", data.session ? "✅ Active" : "❌ No session");
       
+      // Save credentials if remember me is checked
+      if (rememberMe) {
+        localStorage.setItem("rugira-email", email.trim());
+        localStorage.setItem("rugira-password", password);
+        localStorage.setItem("rugira-remember", "true");
+      } else {
+        localStorage.removeItem("rugira-email");
+        localStorage.removeItem("rugira-password");
+        localStorage.removeItem("rugira-remember");
+      }
+      
       toast.success("Welcome back to RUGIRA! 🎉");
       setDebugInfo(`✅ Login successful: ${data.user.email}`);
       
@@ -357,17 +383,37 @@ function AuthPage() {
               <div className="relative">
                 <KeyRound className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   autoComplete="current-password"
-                  className="pl-11"
+                  className="pl-11 pr-11"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={busy}
                 />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
               </div>
             </Field>
+
+            <div className="flex items-center justify-between">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                Remember me
+              </label>
+            </div>
 
             {error && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
