@@ -155,7 +155,7 @@ function PublicFeed() {
             <Logo className="size-9 rounded-xl" />
             <div className="min-w-0 leading-tight">
               <p className="font-display text-lg font-extrabold brand-text">RUGIRA</p>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-accent-foreground">Refresh</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-yellow-500">Refresh</p>
             </div>
           </div>
 
