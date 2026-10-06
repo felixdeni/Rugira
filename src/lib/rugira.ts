@@ -160,3 +160,55 @@ export const RANGE_LABELS: Record<RangeKey, string> = {
   monthly: "Monthly",
   yearly: "Yearly",
 };
+
+/**
+ * Week helpers — all week ranges run Monday → Sunday,
+ * and all dates are returned as YYYY-MM-DD in Africa/Kigali.
+ */
+
+/** Monday of the week containing `d` (YYYY-MM-DD). */
+export function weekStartISO(d: Date = new Date()) {
+  const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = (copy.getDay() + 6) % 7; // Monday = 0
+  copy.setDate(copy.getDate() - day);
+  return todayISO(copy);
+}
+
+/** Sunday of the week containing `d` (YYYY-MM-DD). */
+export function weekEndISO(d: Date = new Date()) {
+  const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = (copy.getDay() + 6) % 7; // Monday = 0
+  copy.setDate(copy.getDate() - day + 6);
+  return todayISO(copy);
+}
+
+/** Shift a date by N weeks (negative = back, positive = forward). */
+export function addWeeks(d: Date, weeks: number) {
+  const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  copy.setDate(copy.getDate() + weeks * 7);
+  return copy;
+}
+
+/** Parse YYYY-MM-DD into a local Date (no timezone drift). */
+export function parseISODate(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
+}
+
+/** Human label for a week range, e.g. "13 Jan – 19 Jan 2025". */
+export function weekLabel(startISO: string, endISO: string) {
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: TIME_ZONE,
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+  const start = fmt.format(parseISODate(startISO));
+  const end = fmt.format(parseISODate(endISO));
+  return `${start} – ${end}`;
+}
+
+/** True if the given ISO date (YYYY-MM-DD) is inside [startISO, endISO] inclusive. */
+export function isDateInRange(dateISO: string, startISO: string, endISO: string) {
+  return dateISO >= startISO && dateISO <= endISO;
+}
