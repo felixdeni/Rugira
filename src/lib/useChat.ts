@@ -82,7 +82,6 @@ export async function uploadChatMedia(userId: string, file: Blob, extension: str
   return { path, error: null };
 }
 
-
 /** Signed URL for a private chat attachment (valid for one hour). */
 export async function signedMediaUrl(path: string) {
   const { data } = await supabase.storage.from(CHAT_BUCKET).createSignedUrl(path, 3600);
@@ -128,7 +127,10 @@ export function useConversation(userId: string | undefined, partnerId: string | 
           if (!inThread) return;
           setMessages((prev) => {
             if (payload.eventType === "DELETE") return prev.filter((m) => m.id !== row.id);
-            if (prev.some((m) => m.id === row.id)) return prev;
+            if (prev.some((m) => m.id === row.id)) {
+              // UPDATE: replace existing row (e.g. media_url nulled out)
+              return prev.map((m) => (m.id === row.id ? row : m));
+            }
             return [...prev, row].sort((a, b) => a.created_at.localeCompare(b.created_at));
           });
         },
@@ -164,5 +166,32 @@ export function useConversation(userId: string | undefined, partnerId: string | 
     [userId, partnerId],
   );
 
-  return { messages, loading, send };
+  // 👇 NEW: delete the media file from storage and remove the message row
+  const remove = useCallback(
+    async (messageId: string, mediaUrl: string | null): Promise<{ error: string | null }> => {
+      try {
+        // 1. Delete file from storage (best-effort; row deletion is the source of truth)
+        if (mediaUrl) {
+          const { error: storageError } = await supabase.storage
+            .from(CHAT_BUCKET)
+            .remove([mediaUrl]);
+          if (storageError) return { error: storageError.message };
+        }
+
+        // 2. Delete the message row (RLS should restrict to sender)
+        const { error } = await supabase.from("messages").delete().eq("id", messageId);
+        if (error) return { error: error.message };
+
+        // 3. Optimistic local update so the bubble disappears immediately
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+        return { error: null };
+      } catch (err) {
+        return { error: err instanceof Error ? err.message : "Delete failed" };
+      }
+    },
+    [],
+  );
+
+  return { messages, loading, send, remove };
 }

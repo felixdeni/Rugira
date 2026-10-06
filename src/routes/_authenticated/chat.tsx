@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Mic, MessagesSquare, Send, Square, X } from "lucide-react";
+import { ImagePlus, Loader2, Mic, MessagesSquare, Send, Square, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button, Card } from "@/components/ui";
@@ -31,8 +31,17 @@ export const Route = createFileRoute("/_authenticated/chat")({
   component: ChatPage,
 });
 
-function MediaBubble({ message }: { message: ChatMessage }) {
+function MediaBubble({
+  message,
+  mine,
+  onDelete,
+}: {
+  message: ChatMessage;
+  mine: boolean;
+  onDelete?: (message: ChatMessage) => void;
+}) {
   const [url, setUrl] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -53,16 +62,59 @@ function MediaBubble({ message }: { message: ChatMessage }) {
     );
   }
 
-  if (message.media_type === "image") {
-    return <img src={url} alt="Shared photo" loading="lazy" className="max-h-64 rounded-xl object-cover" />;
-  }
+  const isImage = message.media_type === "image";
 
   return (
-    <div className="space-y-1">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio controls src={url} className="w-56 max-w-full" />
-      {message.duration_seconds ? (
-        <p className="text-[11px] text-muted-foreground">{Math.round(Number(message.duration_seconds))}s voice message</p>
+    <div className="group relative">
+      {isImage ? (
+        <img src={url} alt="Shared photo" loading="lazy" className="max-h-64 rounded-xl object-cover" />
+      ) : (
+        <div className="space-y-1">
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <audio controls src={url} className="w-56 max-w-full" />
+          {message.duration_seconds ? (
+            <p className="text-[11px] text-muted-foreground">
+              {Math.round(Number(message.duration_seconds))}s voice message
+            </p>
+          ) : null}
+        </div>
+      )}
+
+      {mine && onDelete ? (
+        confirming ? (
+          <div className="mt-1 flex items-center gap-2 rounded-xl bg-destructive/10 px-2 py-1 text-[11px]">
+            <span className="text-foreground">
+              Delete this {isImage ? "photo" : "voice note"}?
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                onDelete(message);
+                setConfirming(false);
+              }}
+              className="rounded-lg bg-destructive px-2 py-0.5 font-semibold text-destructive-foreground"
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirming(false)}
+              className="rounded-lg border border-border px-2 py-0.5 font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            aria-label={isImage ? "Delete photo" : "Delete voice note"}
+            title={isImage ? "Delete photo" : "Delete voice note"}
+            className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition group-hover:opacity-100 focus:opacity-100"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        )
       ) : null}
     </div>
   );
@@ -73,7 +125,7 @@ function ChatPage() {
   const { partners, loading: loadingPartners } = useChatPartners(user?.id, role);
   const [partnerId, setPartnerId] = useState<string | undefined>(undefined);
   const active = partnerId ?? partners[0]?.id;
-  const { messages, loading, send } = useConversation(user?.id, active);
+  const { messages, loading, send, remove } = useConversation(user?.id, active);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [image, setImage] = useState<File | null>(null);
@@ -177,6 +229,15 @@ function ChatPage() {
     setRecording(false);
   };
 
+  const handleDeleteMedia = async (message: ChatMessage) => {
+    const { error } = await remove(message.id, message.media_url);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    toast.success(message.media_type === "image" ? "Photo deleted" : "Voice note deleted");
+  };
+
   return (
     <AppShell role={role} name={fullName}>
       <div className="space-y-4">
@@ -231,7 +292,13 @@ function ChatPage() {
                           : "rounded-bl-sm bg-card text-foreground",
                       )}
                     >
-                      {m.media_url ? <MediaBubble message={m} /> : null}
+                      {m.media_url ? (
+                        <MediaBubble
+                          message={m}
+                          mine={mine}
+                          onDelete={mine ? handleDeleteMedia : undefined}
+                        />
+                      ) : null}
                       {m.body ? <p className="whitespace-pre-wrap break-words">{m.body}</p> : null}
                       <p className="text-right text-[11px] text-muted-foreground" title={saleDateTime(m.created_at)}>
                         {saleTime(m.created_at)}
